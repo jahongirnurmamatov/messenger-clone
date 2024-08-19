@@ -3,6 +3,8 @@ import { usePathname } from "next/navigation";
 import useConversation from "./useConversations";
 import { HiArrowNarrowLeft, HiChat } from "react-icons/hi";
 import { signOut } from "next-auth/react";
+import { HiUsers } from "react-icons/hi2";
+import { SlLogout } from "react-icons/sl";
 
 const useRoutes = ()=>{
     const pathname = usePathname();
@@ -18,15 +20,17 @@ const useRoutes = ()=>{
         {
             label:'Users',
             href:'/users',
-            icon:HiChat,
+            icon:HiUsers,
             active: pathname==='/users'
         },
         {
             label:'Logout',
             href:'#',
             onClick:()=>signOut(),
-            icon:HiArrowNarrowLeft,
+            icon:SlLogout ,
         }
     ],[pathname, conversationId]);
     return routes;
 }
+
+export default useRoutes;
