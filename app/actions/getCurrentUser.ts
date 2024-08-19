@@ -14,7 +14,10 @@ const getCurrentUser = async()=>{
 
         if(!currentUser) return null;
         
+        return currentUser;
     } catch (error) {
         return null;
     }
 }
+
+export default getCurrentUser;
