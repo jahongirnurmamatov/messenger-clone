@@ -53,19 +53,27 @@ const AuthForm = () => {
       <div className="bg-white px-4 py-8 shadow-lg sm:rounded-lg sm:px-10">
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {variant === "REGISTER" && (
-            <Input label="Name" register={register} id="name" errors={errors} />
+            <Input
+              label="Name"
+              register={register}
+              id="name"
+              errors={errors}
+              disabled={isloading}
+            />
           )}
           <Input
             label="Email address"
             register={register}
             id="email"
             errors={errors}
+            disabled={isloading}
           />
           <Input
             label="Password"
             register={register}
             id="password"
             errors={errors}
+            disabled={isloading}
           />
           <div className="">
             <Button disabled={isloading} fullWidth type="submit">
@@ -102,7 +110,7 @@ const AuthForm = () => {
               : "Already have an account?"}
           </div>
           <div className="cursor-pointer underline" onClick={toggleVariant}>
-            {variant ==='LOGIN' ? 'Create an account':'Login'}
+            {variant === "LOGIN" ? "Create an account" : "Login"}
           </div>
         </div>
       </div>
