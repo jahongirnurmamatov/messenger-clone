@@ -5,6 +5,7 @@ import axios from "axios";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { HiPaperAirplane, HiPhoto } from "react-icons/hi2";
 import MessageInput from "./MessageInput";
+import { CldUploadButton } from "next-cloudinary";
 
 const Form = () => {
   const { conversationId } = useConversation();
@@ -20,31 +21,47 @@ const Form = () => {
     },
   });
 
-  const onSubmit:SubmitHandler<FieldValues> = (data)=>{
-    setValue('message','',{shouldValidate:true});
-    axios.post(`/api/messages`,{
-        ...data,
-        conversationId
-    })
-  } 
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    setValue("message", "", { shouldValidate: true });
+    axios.post(`/api/messages`, {
+      ...data,
+      conversationId,
+    });
+  };
+
+  const handleUpload = (result:any)=>{
+    axios.post('/api/messages',{
+      image:result?.info?.secure_url,
+      conversationId
+    });
+  }
   return (
     <div className="py-4 px-4 bg-white items-center flex gap-2 lg:gap-4 w-full border-t">
-        <HiPhoto  className="text-sky-500" size={30}/>
-        <form 
+      <CldUploadButton
+        options={{maxFiles:1}}
+        onSuccess={handleUpload}
+        uploadPreset="messenger clone"
+      >
+        <HiPhoto className="text-sky-500 cursor-pointer" size={30} />
+      </CldUploadButton>
+      <form
         className="flex items-center gap-2 lg:gap-4 w-full"
-        onSubmit={handleSubmit(onSubmit)}>
-            <MessageInput
-             id='message' register={register}
-             required
-             errors={errors}
-             placeholder='Write a message here'
-            />
-            <button
-            className="rounded-full p-2 bg-sky-500 cursor-pointer hover:bg-sky-600 transition"
-            type="submit">
-                <HiPaperAirplane size={18} className="text-white"/>
-            </button>
-        </form>
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <MessageInput
+          id="message"
+          register={register}
+          required
+          errors={errors}
+          placeholder="Write a message here"
+        />
+        <button
+          className="rounded-full p-2 bg-sky-500 cursor-pointer hover:bg-sky-600 transition"
+          type="submit"
+        >
+          <HiPaperAirplane size={18} className="text-white" />
+        </button>
+      </form>
     </div>
   );
 };
