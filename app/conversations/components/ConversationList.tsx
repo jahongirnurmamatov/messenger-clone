@@ -4,11 +4,14 @@ import useConversation from "@/app/hooks/useConversations";
 import { FullConversationType } from "@/app/types";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdOutlineGroupAdd } from "react-icons/md";
 import ConversationBox from "./ConversationBox";
 import GroupChatModal from "./GroupChatModal";
 import { User } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { pusherClient } from "@/app/libs/pusher";
+import { find } from "lodash";
 
 interface ConversationListProps {
   initalItems: FullConversationType[];
@@ -19,10 +22,37 @@ const ConversationList: React.FC<ConversationListProps> = ({
   initalItems,
   users,
 }) => {
+  const session = useSession();
   const [items, setItems] = useState(initalItems);
   const router = useRouter();
   const { isOpen, conversationId } = useConversation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const pusherKey=useMemo(()=>{
+    return session.data?.user?.email;
+  },[session.data?.user?.email]);
+
+  useEffect(()=>{
+    if(!pusherKey){
+      return;
+    }
+    pusherClient.subscribe(pusherKey);
+
+    const newHandler = (conversation:FullConversationType)=>{
+      setItems((current)=>{
+        if(find(current, {id:conversation.id })){
+          return current;
+        }
+        return [conversation, ...current];
+      })
+    }
+    pusherClient.bind('conversation:new',newHandler);
+
+    return ()=>{
+      pusherClient.unsubscribe(pusherKey);
+      pusherClient.unbind('conversation:new',newHandler);
+    }
+  },[pusherKey])
 
   return (
     <>
